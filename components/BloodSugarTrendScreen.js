@@ -14,6 +14,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import { NavigationHelpersContext } from "@react-navigation/native";
+import { collection, onSnapshot, query, addDoc } from "firebase/firestore"
+import { db } from "/Users/priyankha/Developer/React Native Self-Learnt/sugar-hub/components/firebase.js";
 
 function alertConnectGlucometer() {
   Alert.alert(
@@ -31,36 +33,25 @@ var date = day + "/" + month + "/" + year;
 function BloodSugarTrendScreen({ navigation, route }) {
   const [sugarData, setSugarData] = useState([0]);
 
-  // new back button
-  // useEffect(() => {
-  //   navigation.setOptions({
-  //     headerLeft: () => (
-  //       <TouchableOpacity
-  //         style={{ flexDirection: "row" }}
-  //         onPress={() => navigation.navigate("Home")}
-  //       >
-  //         <MaterialIcons
-  //           name="keyboard-arrow-left"
-  //           size={39}
-  //           color="rgb(0, 190, 199)"
-  //           style={{ height: 30 }}
-  //         />
-  //         <Text
-  //           style={{
-  //             fontSize: 17,
-  //             color: "rgb(0, 190, 199)",
-  //             height: 30,
-  //             marginTop: 9,
-  //             marginLeft: -7,
-  //           }}
-  //         >
-  //           Back
-  //         </Text>
-  //       </TouchableOpacity>
-  //     ),
-  //   });
-  // });
+  async function saveSugarData() {
+    await addDoc(collection(db, "sugatdata"), { value: sugarData });
+    navigation.goBack();
+  }
 
+  useEffect(() => {
+    const q = query(collection(db, "sugardata"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const newSugar = querySnapshot.docs.map((doc, index) => {
+        return { ...doc.data(), id: index };
+      });
+      setSugarData(newSugar);
+    })
+
+    return () => {
+      unsubscribe();
+    };
+  }, [])
   useEffect(() => {
     if (isNaN(route.params?.sugarValue)) {
       null;

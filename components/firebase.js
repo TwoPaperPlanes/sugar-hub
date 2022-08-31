@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
-import * as firebase from "firebase"
+import * as firebase from "firebase";
+import {getFirestore} from "firebase/firestore"
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBM6ORowDWzgVIBJz3QaU0oMTZYfHsrj54",
@@ -14,15 +15,15 @@ const firebaseConfig = {
 // Initialize Firebase
 let app;
 if (firebase.apps.length === 0) {
-    app = firebase.initializeApp(firebaseConfig);
+  app = firebase.initializeApp(firebaseConfig);
 } else {
-    app = firebase.app()
+  app = firebase.app();
 }
 
-const auth = firebase.auth()
+var db = app.firestore();
 
-export {
-  auth
-}
+const auth = firebase.auth();
+
+export { auth, db };
 
 // database for glucose trend screen
